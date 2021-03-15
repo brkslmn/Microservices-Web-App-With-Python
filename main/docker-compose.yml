@@ -1,0 +1,35 @@
+version: '3.8'
+services: 
+  
+  backend:
+    build:
+      context: .
+      dockerfile: DockerFile
+    command: 'python main.py'
+    ports:
+      - 8001:5000
+    volumes: 
+      - .:/app
+    depends_on: 
+      - db
+  
+  queue:
+    build:
+      context: .
+      dockerfile: DockerFile
+    command: 'python -u consumer.py'
+    depends_on: 
+      - db
+  
+  db:
+    image: mysql:5.7.22
+    restart: always
+    environment: 
+      MYSQL_DATABASE: main
+      MYSQL_USER: mydb
+      MYSQL_PASSWORD: mydb
+      MYSQL_ROOT_PASSWORD: mydb
+    volumes: 
+      - .dbdata:/var/lib/mysql
+    ports:
+      - 33067:3306
